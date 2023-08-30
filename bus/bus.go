@@ -1,14 +1,17 @@
 package bus
 
-type BusAvailable struct {
-	ID       string `json:"proposalId"`
-	Name     string `json:"companyName"`
-	Date     string `json:"departureDate"`
-	Time     string `json:"departureTime"`
-	Terminal string `json:"orginTerminal"`
+import "time"
+
+type Ticket struct {
+	ID       string
+	Name     string
+	Date     time.Time
+	Time     string
+	Terminal string
+	Seats    int
 }
 
-type Seats struct {
+type TicketSeat struct {
 	Index  int    `json:"index"`
 	Number int    `json:"number"`
 	Column int    `json:"column"`
@@ -16,6 +19,4 @@ type Seats struct {
 	Status string `json:"status"`
 }
 
-func (ba *BusAvailable) Seats() ([]Seats, error) {
-	return GetSeats(ba.ID)
-}
+type TicketSeats []TicketSeat

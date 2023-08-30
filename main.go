@@ -2,20 +2,20 @@ package main
 
 import (
 	"bus_listener/bus"
-	"bus_listener/locations"
-	"log"
 	"time"
 )
 
 func main() {
-	date := time.Now()
-	availables, err := bus.GetAvailables(locations.Tehran, locations.Shahroud, date)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, available := range availables {
-		seats, _ := available.Seats()
-		log.Printf("Name: %s -> Number of seats: %d", available.Name, len(seats))
-	}
+	alibaba := bus.NewAlibaba()
+	helper := bus.NewHelper(alibaba)
+	helper.BussesByReceivingTime(alibaba.Tehran(), alibaba.Shahroud(), time.Now().AddDate(0, 0, 2))
+	//result, err := alibaba.Busses(alibaba.Tehran(), alibaba.Shahroud(), time.Now().AddDate(0, 0, 1))
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//for _, ticket := range result {
+	//	if ticket.Seats > 0 {
+	//		log.Println(ticket.Name, ticket.Date, ticket.Time)
+	//	}
+	//}
 }
