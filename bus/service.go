@@ -1,6 +1,7 @@
 package bus
 
 import (
+	"bus_listener/env"
 	"bus_listener/notification"
 	"context"
 	"fmt"
@@ -52,7 +53,15 @@ func (s Helper) BussesByArrivedTime(start, dest string, date time.Time) []Ticket
 
 func (s Helper) CheckInterval(start string, end string, quit chan struct{}) {
 	ctx := context.Background()
-	ticker := time.NewTicker(10 * time.Second)
+	duration, duErr := time.ParseDuration(env.Service.Interval)
+
+	// If program has error make duration to 10
+	if duErr != nil {
+		duration = time.Second * 10
+	}
+
+	ticker := time.NewTicker(duration)
+
 	go func() {
 		for {
 			select {

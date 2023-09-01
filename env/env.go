@@ -9,8 +9,15 @@ func LoadEnvironment() error {
 		return err
 	}
 
-	if err := loadTelegram(); err != nil {
-		return err
+	environments := []func() error{
+		loadTelegram,
+		loadService,
+	}
+
+	for _, environment := range environments {
+		if err := environment(); err != nil {
+			return err
+		}
 	}
 
 	return nil
