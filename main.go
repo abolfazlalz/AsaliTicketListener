@@ -2,20 +2,16 @@ package main
 
 import (
 	"bus_listener/bus"
-	"time"
+	"fmt"
 )
 
 func main() {
 	alibaba := bus.NewAlibaba()
 	helper := bus.NewHelper(alibaba)
-	helper.BussesByReceivingTime(alibaba.Tehran(), alibaba.Shahroud(), time.Now().AddDate(0, 0, 2))
-	//result, err := alibaba.Busses(alibaba.Tehran(), alibaba.Shahroud(), time.Now().AddDate(0, 0, 1))
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//for _, ticket := range result {
-	//	if ticket.Seats > 0 {
-	//		log.Println(ticket.Name, ticket.Date, ticket.Time)
-	//	}
-	//}
+
+	quit := make(chan struct{})
+	go helper.CheckInterval(alibaba.Tehran(), alibaba.Shahroud(), quit)
+	go helper.CheckInterval(alibaba.Shahroud(), alibaba.Tehran(), quit)
+
+	_, _ = fmt.Scanln()
 }
