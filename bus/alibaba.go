@@ -98,7 +98,9 @@ func (a Alibaba) Busses(startCity string, destinationCity string, time time.Time
 		return nil, err
 	}
 
-	defer response.Body.Close()
+	defer func() {
+		_ = response.Body.Close()
+	}()
 
 	body, err := io.ReadAll(response.Body)
 
@@ -129,7 +131,9 @@ func (a Alibaba) TicketSeats(ticket Ticket) (TicketSeats, error) {
 		return nil, err
 	}
 
-	defer response.Body.Close()
+	defer func() {
+		_ = response.Body.Close()
+	}()
 
 	body, err := io.ReadAll(response.Body)
 
@@ -150,6 +154,15 @@ func (a Alibaba) TicketSeats(ticket Ticket) (TicketSeats, error) {
 	}
 
 	return result.Result, err
+}
+
+func (a Alibaba) GetCity(cityId string) string {
+	if cityId == "87330000" {
+		return "شاهرود"
+	} else if cityId == "11320000" {
+		return "تهران"
+	}
+	return "ناآشنا"
 }
 
 func (a Alibaba) Shahroud() string {

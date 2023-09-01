@@ -1,6 +1,7 @@
 package bus
 
 import (
+	"bus_listener/notification"
 	"context"
 	"fmt"
 	"log/slog"
@@ -11,16 +12,21 @@ type ServiceInterface interface {
 	Busses(startCity string, destinationCity string, time time.Time) ([]Ticket, error)
 	BussesWithChannel(startCity string, destinationCity string, time time.Time, ch chan []Ticket)
 	TicketSeats(Ticket) (TicketSeats, error)
+	GetCity(cityId string) string
 	Shahroud() string
 	Tehran() string
 }
 
 type Helper struct {
-	service ServiceInterface
+	service      ServiceInterface
+	notification notification.Interface
 }
 
-func NewHelper(service ServiceInterface) *Helper {
-	return &Helper{service: service}
+func NewHelper(service ServiceInterface, notification notification.Interface) *Helper {
+	return &Helper{
+		service:      service,
+		notification: notification,
+	}
 }
 
 func (s Helper) BussesByArrivedTime(start, dest string, date time.Time) []Ticket {
@@ -46,7 +52,7 @@ func (s Helper) BussesByArrivedTime(start, dest string, date time.Time) []Ticket
 
 func (s Helper) CheckInterval(start string, end string, quit chan struct{}) {
 	ctx := context.Background()
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(10 * time.Second)
 	go func() {
 		for {
 			select {
@@ -77,6 +83,14 @@ func (s Helper) CheckInterval(start string, end string, quit chan struct{}) {
 						ticket.Seats,
 					)
 
+					msg := fmt.Sprintf("اتوبوس موجود شد %s به %s در ساعت %s به تعداد صندلی %d", s.service.GetCity(start), s.service.GetCity(end), ticket.Date, ticket.Seats)
+					err := s.notification.Send(notification.Message{
+						Title: "",
+						Text:  msg,
+					})
+					if err != nil {
+						slog.Error(err.Error())
+					}
 				}
 			case <-quit:
 				ticker.Stop()
